@@ -3,7 +3,8 @@ package controllers
 import (
 	"fmt"
 	"html/template"
-	"os"
+	"log"
+	"net/url"
 	"time"
 
 	"github.com/debuqer/telem/src/domains/models"
@@ -24,10 +25,11 @@ type RegisterPageData struct {
 }
 
 func (controller *UserController) Register(c *gin.Context) {
+	location := url.URL{Path: "/register"}
 	data := RegisterPageData{
 		Title: "Registeration",
 		Form: Form{
-			Action: os.Getenv("URL") + "/register",
+			Action: location.RequestURI(),
 			Method: "POST",
 		},
 	}
@@ -48,5 +50,11 @@ func (controller *UserController) DoRegister(c *gin.Context) {
 		CreatedAt: time.Now(),
 	}
 
-	user.Insert()
+	err := user.Insert()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	location := url.URL{Path: "/register"}
+	c.Redirect(302, location.RequestURI())
 }

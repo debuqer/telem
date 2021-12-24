@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/debuqer/telem/src/domains/services"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -23,7 +24,9 @@ func (model *User) Insert() error {
 		log.Fatal(err)
 		return err
 	}
-	stmt.Exec(model.Username, model.Password, model.CreatedAt)
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(model.Password), 14)
+	_, err = stmt.Exec(model.Username, password, model.CreatedAt)
 
 	return err
 }
