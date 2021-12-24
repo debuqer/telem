@@ -1,0 +1,13 @@
+<html>
+    <h1>{{ .Title }}</h1>
+
+    <form action="{{ .Form.Action }}" method="{{ .Form.Method }}">
+        <label>Username</label>
+        <input type="text" name="username" value=""/>
+
+        <label>Password</label>
+        <input type="password" name="password" value=""/>
+
+        <input type="submit" name="action" value="submit"/>
+    </form>
+</html>
