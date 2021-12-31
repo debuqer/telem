@@ -20,6 +20,11 @@ type Form struct {
 	Method string
 }
 
+type RegisterValidation struct {
+	Username string `form:"username" json:"username" binding:"required,min=3"`
+	Password string `form:"password" json:"password" binding:"required,min=6"`
+}
+
 type RegisterPageData struct {
 	Title   string
 	Form    Form
@@ -51,16 +56,23 @@ func (controller *UserController) Register(c *gin.Context) {
 
 func (controller *UserController) DoRegister(c *gin.Context) {
 	session := sessions.Default(c)
-	user := models.User{
-		Id:        0,
-		Username:  c.Request.FormValue("username"),
-		Password:  c.Request.FormValue("password"),
-		CreatedAt: time.Now(),
-	}
 
-	_, err := user.Insert()
-	if err != nil {
+	validationForm := RegisterValidation{}
+	if err := c.ShouldBind(&validationForm); err != nil {
 		session.AddFlash(err.Error())
+	} else {
+		user := models.User{
+			Id:        0,
+			Username:  c.Request.FormValue("username"),
+			Password:  c.Request.FormValue("password"),
+			CreatedAt: time.Now(),
+		}
+
+		_, err := user.Insert()
+		if err != nil {
+			session.AddFlash(err.Error())
+		}
+
 	}
 	session.Save()
 
