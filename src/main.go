@@ -5,6 +5,8 @@ import (
 	"log"
 
 	"github.com/debuqer/telem/src/controllers"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
@@ -22,8 +24,10 @@ func GetEnvVariables() {
 func main() {
 	GetEnvVariables()
 
+	store := cookie.NewStore([]byte("sessions"))
 	r := gin.Default()
 
+	r.Use(sessions.Sessions("secret", store))
 	uc := controllers.UserController{}
 
 	r.GET("/hello", func(c *gin.Context) {

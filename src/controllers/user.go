@@ -3,11 +3,11 @@ package controllers
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/url"
 	"time"
 
 	"github.com/debuqer/telem/src/domains/models"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,12 +19,40 @@ type Form struct {
 	Method string
 }
 
+type Message struct {
+	Provider string
+	Context  string
+}
+
+func getMessageContainer(s sessions.Session) Message {
+	message := Message{
+		Provider: "",
+		Context:  "",
+	}
+	flashes := s.Flashes()
+	if len(flashes) == 1 {
+		if flashes != nil {
+			message = Message{
+				Provider: "error",
+				Context:  fmt.Sprint(flashes[0]),
+			}
+		}
+	}
+
+	return message
+}
+
 type RegisterPageData struct {
-	Title string
-	Form  Form
+	Title   string
+	Form    Form
+	Message Message
 }
 
 func (controller *UserController) Register(c *gin.Context) {
+	session := sessions.Default(c)
+	message := getMessageContainer(session)
+	session.Save()
+
 	location := url.URL{Path: "/register"}
 	data := RegisterPageData{
 		Title: "Registeration",
@@ -32,6 +60,7 @@ func (controller *UserController) Register(c *gin.Context) {
 			Action: location.RequestURI(),
 			Method: "POST",
 		},
+		Message: message,
 	}
 
 	tmpl, err := template.ParseFiles("src/domains/templates/auth/register.html")
@@ -43,6 +72,7 @@ func (controller *UserController) Register(c *gin.Context) {
 }
 
 func (controller *UserController) DoRegister(c *gin.Context) {
+	session := sessions.Default(c)
 	user := models.User{
 		Id:        0,
 		Username:  c.Request.FormValue("username"),
@@ -50,10 +80,11 @@ func (controller *UserController) DoRegister(c *gin.Context) {
 		CreatedAt: time.Now(),
 	}
 
-	err := user.Insert()
+	_, err := user.Insert()
 	if err != nil {
-		log.Fatal(err)
+		session.AddFlash(err.Error())
 	}
+	session.Save()
 
 	location := url.URL{Path: "/register"}
 	c.Redirect(302, location.RequestURI())
