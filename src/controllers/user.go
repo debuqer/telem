@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/debuqer/telem/src/domains/models"
+	"github.com/debuqer/telem/src/domains/services"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -19,38 +20,15 @@ type Form struct {
 	Method string
 }
 
-type Message struct {
-	Provider string
-	Context  string
-}
-
-func getMessageContainer(s sessions.Session) Message {
-	message := Message{
-		Provider: "",
-		Context:  "",
-	}
-	flashes := s.Flashes()
-	if len(flashes) == 1 {
-		if flashes != nil {
-			message = Message{
-				Provider: "error",
-				Context:  fmt.Sprint(flashes[0]),
-			}
-		}
-	}
-
-	return message
-}
-
 type RegisterPageData struct {
 	Title   string
 	Form    Form
-	Message Message
+	Message services.Message
 }
 
 func (controller *UserController) Register(c *gin.Context) {
 	session := sessions.Default(c)
-	message := getMessageContainer(session)
+	message := services.GetMessageContainer(session)
 	session.Save()
 
 	location := url.URL{Path: "/register"}
