@@ -28,13 +28,18 @@ func main() {
 	r := gin.Default()
 
 	r.Use(sessions.Sessions("secret", store))
+
 	uc := controllers.UserController{}
 
 	r.GET("/hello", func(c *gin.Context) {
 		fmt.Println("hello")
 	})
-	r.GET("/register", uc.Register)
-	r.POST("/register", uc.DoRegister)
+
+	userGroup := r.Group("/user/")
+	{
+		userGroup.GET("/register", uc.Register)
+		userGroup.POST("/register", uc.DoRegister)
+	}
 
 	r.Run()
 }
