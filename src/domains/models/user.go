@@ -55,10 +55,31 @@ func (model *User) Insert() (int64, error) {
 		model.UpdatedAt,
 	)
 
+	userId, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
-	userId, err := result.LastInsertId()
+	model.Id = int(userId)
+
+	err = model.RequestVerificationCode()
+	if err != nil {
+		return 0, err
+	}
 
 	return userId, err
+}
+
+func (model *User) RequestVerificationCode() error {
+	verificationModel := UserVerification{
+		UserId: model.Id,
+		Type:   "email",
+		Code:   "test",
+	}
+
+	err := verificationModel.GenerateVerificationCode()
+	if err != nil {
+		return nil
+	}
+
+	return err
 }
