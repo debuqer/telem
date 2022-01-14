@@ -73,7 +73,6 @@ func (model *User) RequestVerificationCode() error {
 	verificationModel := UserVerification{
 		UserId: model.Id,
 		Type:   "email",
-		Code:   "test",
 	}
 
 	err := verificationModel.GenerateVerificationCode()

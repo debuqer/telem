@@ -2,6 +2,8 @@ package models
 
 import (
 	"log"
+	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/debuqer/telem/src/domains/services"
@@ -18,6 +20,7 @@ func (userVerficiation *UserVerification) GenerateVerificationCode() error {
 	db, _ := services.InitDB()
 
 	userVerficiation.CreatedAt = time.Now()
+	userVerficiation.Code = strconv.Itoa(rand.Int())
 
 	stmt, err := db.Prepare(`
 	 INSERT INTO go.user_verifications
