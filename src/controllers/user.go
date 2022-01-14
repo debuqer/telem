@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
-	"time"
 
 	"github.com/debuqer/telem/src/domains/models"
 	"github.com/debuqer/telem/src/domains/services"
@@ -21,7 +20,8 @@ type Form struct {
 }
 
 type RegisterValidation struct {
-	Username string `form:"username" json:"username" binding:"required,min=3"`
+	Name     string `form:"name" json:"username" binding:"required,min=3"`
+	Email    string `form:"email" json:"email" binding:"required,min=3"`
 	Password string `form:"password" json:"password" binding:"required,min=6"`
 }
 
@@ -36,7 +36,7 @@ func (controller *UserController) Register(c *gin.Context) {
 	message := services.GetMessageContainer(session)
 	session.Save()
 
-	location := url.URL{Path: "/register"}
+	location := url.URL{Path: "/user/register"}
 	data := RegisterPageData{
 		Title: "Registeration",
 		Form: Form{
@@ -62,10 +62,10 @@ func (controller *UserController) DoRegister(c *gin.Context) {
 		session.AddFlash(err.Error())
 	} else {
 		user := models.User{
-			Id:        0,
-			Username:  c.Request.FormValue("username"),
-			Password:  c.Request.FormValue("password"),
-			CreatedAt: time.Now(),
+			Id:       0,
+			Name:     c.Request.FormValue("name"),
+			Email:    c.Request.FormValue("email"),
+			Password: c.Request.FormValue("password"),
 		}
 
 		_, err := user.Insert()
@@ -76,6 +76,6 @@ func (controller *UserController) DoRegister(c *gin.Context) {
 	}
 	session.Save()
 
-	location := url.URL{Path: "/register"}
+	location := url.URL{Path: "/user/register"}
 	c.Redirect(302, location.RequestURI())
 }

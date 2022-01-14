@@ -9,17 +9,34 @@ import (
 )
 
 type User struct {
-	Id        int
-	Username  string
-	CreatedAt time.Time
-	Password  string
+	Id              int
+	Name            string
+	Email           string
+	EmailVerifiedAt time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Password        string
+	RememberToken   string
 }
 
 func (model *User) Insert() (int64, error) {
 	db, _ := services.InitDB()
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO users( username, password, created_at) VALUES(?, ?, ?)")
+	model.CreatedAt = time.Now()
+	model.UpdatedAt = time.Now()
+	model.RememberToken = ""
+
+	stmt, err := db.Prepare(`INSERT INTO go.users
+	(
+		name,
+		email,
+		password,
+		created_at,
+		updated_at
+	)
+	VALUES
+	(?, ?, ?, ?, ?);`)
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
@@ -30,7 +47,14 @@ func (model *User) Insert() (int64, error) {
 		return 0, err
 	}
 
-	result, err := stmt.Exec(model.Username, password, model.CreatedAt)
+	result, err := stmt.Exec(
+		model.Name,
+		model.Email,
+		password,
+		model.CreatedAt,
+		model.UpdatedAt,
+	)
+
 	if err != nil {
 		return 0, err
 	}
