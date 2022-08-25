@@ -6,12 +6,15 @@
     <body>
         <img src="/statics/img/login.jpg" />
 
-        <form action="" method="POST" />
+        <form action="" method="POST" enctype="multipart/form-data"/>
             <label>Username</label>
             <input type="text" name="username" value = "{{ .Username }}"/>
 
-            <label>Password</label>
-            <input type="password" name="password" />
+            <label>Name</label>
+            <input type="text" name="name" value="{{ .Name }}"/>
+
+            <label>Profile</label>
+            <input type="file" name="profile" />
 
             <input type="submit" name="submit" value="submit"/> 
         </form>
