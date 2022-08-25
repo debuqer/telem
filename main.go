@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 var tpl *template.Template
@@ -13,26 +14,28 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/login", login)
+	mux := httprouter.New()
 
-	fmt.Println("Start listening on 8080")
-	http.ListenAndServe(":8080", nil)
+	mux.GET("/login", login)
+	mux.POST("/login", applyLogin)
+	http.ListenAndServe(":8080", mux)
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	type LoginForm struct {
+func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	data := struct {
 		Username string
+	}{
+		"",
 	}
 
-	var data LoginForm
-	if r.Method == http.MethodPost {
-		data = LoginForm{
-			r.FormValue("username"),
-		}
-	} else {
-		data = LoginForm{
-			"",
-		}
+	tpl.ExecuteTemplate(w, "login.gohtml", data)
+}
+
+func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	data := struct {
+		Username string
+	}{
+		r.FormValue("username"),
 	}
 
 	tpl.ExecuteTemplate(w, "login.gohtml", data)
