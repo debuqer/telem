@@ -40,14 +40,6 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	data := struct {
-		Username string
-		Name     string
-	}{
-		r.FormValue("username"),
-		r.FormValue("name"),
-	}
-
 	f, h, err := r.FormFile("profile")
 	if err != nil {
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -70,7 +62,7 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	tpl.ExecuteTemplate(w, "login.gohtml", data)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
