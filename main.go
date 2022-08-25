@@ -10,12 +10,13 @@ import (
 var tpl *template.Template
 
 func init() {
-	tpl = template.Must(template.New("").ParseGlob("statics/*.gohtml"))
+	tpl = template.Must(template.New("").ParseGlob("templates/*.gohtml"))
 }
 
 func main() {
 	mux := httprouter.New()
 
+	mux.GET("/login-image", loginImage)
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 	http.ListenAndServe(":8080", mux)
@@ -29,6 +30,10 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	tpl.ExecuteTemplate(w, "login.gohtml", data)
+}
+
+func loginImage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	http.ServeFile(w, r, "statics/img/login.jpg")
 }
 
 func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
