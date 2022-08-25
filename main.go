@@ -16,6 +16,7 @@ func init() {
 func main() {
 	mux := httprouter.New()
 
+	mux.NotFound = http.HandlerFunc(notFound)
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 
@@ -41,4 +42,8 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	tpl.ExecuteTemplate(w, "login.gohtml", data)
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "Not Found", http.StatusNotFound)
 }
