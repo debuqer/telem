@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type User struct {
@@ -87,7 +89,7 @@ func uploadProfile(r *http.Request) (string, error) {
 		return "", errors.New("Profile image must be present")
 	}
 
-	profileUrl := "uploads/" + h.Filename
+	profileUrl := filepath.Join("uploads/", strings.Replace(h.Filename, " ", "-", -1))
 
 	bs, err := ioutil.ReadAll(f)
 	if err != nil {
