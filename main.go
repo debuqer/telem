@@ -24,6 +24,7 @@ func main() {
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 	mux.GET("/logout", logout)
+	mux.GET("/panel", panel)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	http.ListenAndServe(":8080", mux)
@@ -93,6 +94,15 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 	return
+}
+
+func panel(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u, err := currentUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+
+	tpl.ExecuteTemplate(w, "panel.gohtml", u)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

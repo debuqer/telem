@@ -58,11 +58,12 @@ func findUser(username string) (u User, err error) {
 	for _, element := range users {
 		if element.Username == username {
 			u = element
+			return u, nil
 		}
 	}
 	err = errors.New("No user found")
 
-	return
+	return u, err
 }
 
 func checkPassword(u User, p string) bool {
