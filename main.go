@@ -85,6 +85,7 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
