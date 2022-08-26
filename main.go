@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -68,16 +69,20 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:  "username",
-		Value: r.FormValue("username"),
-	})
+	uuid := uuid.Must(uuid.NewUUID())
+	_, err = r.Cookie("session")
+	if err == http.ErrNoCookie {
+		http.SetCookie(w, &http.Cookie{
+			Name:  "session",
+			Value: uuid.String(),
+		})
+	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c, err := r.Cookie("username")
+	c, err := r.Cookie("session")
 
 	if err == nil {
 		c.MaxAge = -1
