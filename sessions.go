@@ -14,3 +14,7 @@ func getSession(sid string) string {
 func setSession(sid string, value string) {
 	dbSessions[sid] = value
 }
+
+func unsetSession(sid string) {
+	delete(dbSessions, sid)
+}

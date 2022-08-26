@@ -15,7 +15,7 @@ func signup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	profileUrl, err := uploadProfile(r)
 	if err != nil {
-		http.Redirect(w, r, "/signup", http.StatusSeeOther)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println(err)
 	}
 
@@ -27,7 +27,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	})
 
 	if err != nil {
-		http.Redirect(w, r, "/signup", http.StatusSeeOther)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println(err)
 	}
 
@@ -50,8 +50,7 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	u, err := userLogin(username, password)
 	if err != nil {
-		fmt.Println(err)
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -68,6 +67,7 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if err == nil {
 		c.MaxAge = -1
 		http.SetCookie(w, c)
+		unsetSession(c.Value)
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -77,7 +77,7 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func panel(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, err := currentUser(r)
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	tpl.ExecuteTemplate(w, "panel.gohtml", u)
