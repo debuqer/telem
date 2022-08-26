@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+    <head>
+        <title>Signup page</title>
+    </head>
+
+    <body>
+        <img src="/statics/img/signup.jpg" />
+
+        <form action="" method="POST" enctype="multipart/form-data"/>
+            <label>Username</label>
+            <input type="text" name="username" value = "{{ .Username }}"/>
+
+            <label>Name</label>
+            <input type="text" name="name" value="{{ .Name }}"/>
+
+            <label>Profile</label>
+            <input type="file" name="profile" />
+
+            <label>Password</label>
+            <input type="password" name="password"/>
+
+            <input type="submit" name="submit" value="submit"/> 
+        </form>
+    </body>
+</html>

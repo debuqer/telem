@@ -21,12 +21,17 @@ func main() {
 	mux := httprouter.New()
 
 	mux.NotFound = http.HandlerFunc(notFound)
+	mux.GET("/signup", signup)
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 	mux.GET("/logout", logout)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	http.ListenAndServe(":8080", mux)
+}
+
+func signup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 }
 
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
