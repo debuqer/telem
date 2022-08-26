@@ -31,7 +31,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		fmt.Println(err)
 	}
 
-	http.Redirect(w, r, "/signup", http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 	return
 }
 
