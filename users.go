@@ -39,6 +39,16 @@ func addUser(u User) error {
 	return nil
 }
 
+func userLogin(username string, password string) (User, error) {
+	for _, element := range users {
+		if element.Password == password && element.Username == username {
+			return element, nil
+		}
+	}
+
+	return User{}, errors.New("User not found")
+}
+
 func getUser(i int) User {
 	return users[i]
 }

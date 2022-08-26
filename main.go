@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 
-	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -59,55 +56,21 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	data := struct {
-		Username string
-		Name     string
-	}{
-		"",
-		"",
-	}
-
-	cookie, err := r.Cookie("username")
-	if err == nil {
-		data.Username = cookie.Value
-	}
-
-	tpl.ExecuteTemplate(w, "login.gohtml", data)
+	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
 func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	f, h, err := r.FormFile("profile")
-	if err != nil {
-		http.Error(w, "internal error", http.StatusInternalServerError)
-		fmt.Println(err)
-		return
-	}
-	defer f.Close()
+	username := r.FormValue("username")
+	password := r.FormValue("password")
 
-	bs, err := ioutil.ReadAll(f)
+	_, err := userLogin(username, password)
 	if err != nil {
-		http.Error(w, "File is not readable", http.StatusBadGateway)
 		fmt.Println(err)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
-	err = ioutil.WriteFile(filepath.Join("uploads/", h.Filename), bs, 0644)
-	if err != nil {
-		http.Error(w, "bad uploaded", http.StatusInternalServerError)
-		fmt.Println(err)
-		return
-	}
-
-	uuid := uuid.Must(uuid.NewUUID())
-	_, err = r.Cookie("session")
-	if err == http.ErrNoCookie {
-		http.SetCookie(w, &http.Cookie{
-			Name:  "session",
-			Value: uuid.String(),
-		})
-	}
-
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/panel", http.StatusSeeOther)
 }
 
 func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
