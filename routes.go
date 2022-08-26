@@ -22,7 +22,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	err = addUser(User{
 		Name:       r.FormValue("name"),
 		Username:   r.FormValue("username"),
-		Password:   r.FormValue("password"),
+		Password:   []byte(r.FormValue("password")),
 		ProfileUrl: profileUrl,
 	})
 

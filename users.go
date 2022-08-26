@@ -8,13 +8,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
 	Name       string
 	Username   string
 	ProfileUrl string
-	Password   string
+	Password   []byte
 }
 
 var users []User
@@ -31,9 +33,12 @@ func addUser(u User) error {
 		return errors.New("Username must be unique")
 	}
 
-	if u.Password == "" || len(u.Password) < 6 {
+	if len(u.Password) < 6 {
 		return errors.New("Password must contains at least 6 characters")
 	}
+
+	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
+	fmt.Println(u)
 
 	users = append(users, u)
 	fmt.Println("user", u.Name, "with username", u.Username, "created")
@@ -43,7 +48,9 @@ func addUser(u User) error {
 
 func userLogin(username string, password string) (User, error) {
 	for _, element := range users {
-		if element.Password == password && element.Username == username {
+		err := bcrypt.CompareHashAndPassword(element.Password, []byte(password))
+
+		if err == nil && element.Username == username {
 			return element, nil
 		}
 	}
@@ -66,10 +73,6 @@ func findUser(username string) (u User, err error) {
 	err = errors.New("No user found")
 
 	return u, err
-}
-
-func checkPassword(u User, p string) bool {
-	return u.Password == p
 }
 
 func isUsernameUnique(username string) bool {
