@@ -17,6 +17,7 @@ type User struct {
 	Username   string
 	ProfileUrl string
 	Password   []byte
+	Role       string
 }
 
 var users []User
@@ -122,4 +123,8 @@ func currentUser(r *http.Request) (User, error) {
 	}
 
 	return User{}, errors.New("Not seted sid")
+}
+
+func havePerm(u User, roleName string) bool {
+	return u.Role == roleName
 }

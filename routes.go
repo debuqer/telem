@@ -24,6 +24,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		Username:   r.FormValue("username"),
 		Password:   []byte(r.FormValue("password")),
 		ProfileUrl: profileUrl,
+		Role:       "admin",
 	})
 
 	if err != nil {
