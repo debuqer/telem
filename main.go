@@ -36,6 +36,11 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		"",
 	}
 
+	cookie, err := r.Cookie("username")
+	if err == nil {
+		data.Username = cookie.Value
+	}
+
 	tpl.ExecuteTemplate(w, "login.gohtml", data)
 }
 
@@ -61,6 +66,11 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		fmt.Println(err)
 		return
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:  "username",
+		Value: r.FormValue("username"),
+	})
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
