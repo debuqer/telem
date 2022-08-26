@@ -53,6 +53,18 @@ func getUser(i int) User {
 	return users[i]
 }
 
+func findUser(username string) (u User, err error) {
+	u = User{}
+	for _, element := range users {
+		if element.Username == username {
+			u = element
+		}
+	}
+	err = errors.New("No user found")
+
+	return
+}
+
 func checkPassword(u User, p string) bool {
 	return u.Password == p
 }
@@ -89,4 +101,19 @@ func uploadProfile(r *http.Request) (string, error) {
 	newFile.Write(bs)
 
 	return profileUrl, nil
+}
+
+func currentUser(r *http.Request) (User, error) {
+	sid := getCookieValue(r.Cookie("session"))
+	if sid != "" {
+		un := getSession(sid)
+		u, err := findUser(un)
+		if err != nil {
+			return User{}, errors.New("Not found user")
+		}
+
+		return u, nil
+	}
+
+	return User{}, errors.New("Not seted sid")
 }

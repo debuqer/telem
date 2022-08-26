@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -56,6 +57,11 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	_, err := currentUser(r)
+	if err == nil {
+		http.Redirect(w, r, "/panel", http.StatusSeeOther)
+	}
+
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
 }
 
@@ -63,12 +69,16 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	_, err := userLogin(username, password)
+	u, err := userLogin(username, password)
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+
+	sid := uuid.Must(uuid.NewRandom()).String()
+	SetCookie(w, "session", sid)
+	setSession(sid, u.Username)
 
 	http.Redirect(w, r, "/panel", http.StatusSeeOther)
 }
