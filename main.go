@@ -22,6 +22,7 @@ func main() {
 	mux.NotFound = http.HandlerFunc(notFound)
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
+	mux.GET("/logout", logout)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	http.ListenAndServe(":8080", mux)
@@ -71,6 +72,17 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		Name:  "username",
 		Value: r.FormValue("username"),
 	})
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	c, err := r.Cookie("username")
+
+	if err == nil {
+		c.MaxAge = -1
+		http.SetCookie(w, c)
+	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
