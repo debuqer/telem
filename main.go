@@ -22,6 +22,7 @@ func main() {
 
 	mux.NotFound = http.HandlerFunc(notFound)
 	mux.GET("/signup", signup)
+	mux.POST("/signup", applySignup)
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 	mux.GET("/logout", logout)
@@ -32,6 +33,29 @@ func main() {
 
 func signup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
+}
+
+func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	profileUrl, err := uploadProfile(r)
+	if err != nil {
+		http.Redirect(w, r, "/signup", http.StatusSeeOther)
+		fmt.Println(err)
+	}
+
+	err = addUser(User{
+		Name:       r.FormValue("name"),
+		Username:   r.FormValue("username"),
+		Password:   r.FormValue("password"),
+		ProfileUrl: profileUrl,
+	})
+
+	if err != nil {
+		http.Redirect(w, r, "/signup", http.StatusSeeOther)
+		fmt.Println(err)
+	}
+
+	http.Redirect(w, r, "/signup", http.StatusSeeOther)
+	return
 }
 
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
