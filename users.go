@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -41,13 +42,16 @@ func addUser(u User) error {
 	}
 
 	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
-	fmt.Println(u)
 
-	users = append(users, u)
-
+	Conn, err := sql.Open("mysql", sqlSrc)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer Conn.Close()
+	fmt.Println(Conn)
 	query := "INSERT INTO users ( name, username, password, profile_url, created_at ) VALUES ( '" + u.Name + "', '" + u.Username + "', '" + string(u.Password) + "', '" + u.ProfileUrl + "', NOW() )"
 	fmt.Println(query)
-	_, err := Conn.Exec(query)
+	_, err = Conn.Exec(query)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -58,12 +62,11 @@ func addUser(u User) error {
 }
 
 func userLogin(username string, password string) (User, error) {
-	for _, element := range users {
-		err := bcrypt.CompareHashAndPassword(element.Password, []byte(password))
+	element, _ := findUser(username)
+	err := bcrypt.CompareHashAndPassword(element.Password, []byte(password))
 
-		if err == nil && element.Username == username {
-			return element, nil
-		}
+	if err == nil && element.Username == username {
+		return element, nil
 	}
 
 	return User{}, errors.New("User not found")
@@ -75,13 +78,18 @@ func getUser(i int) User {
 
 func findUser(username string) (u User, err error) {
 	u = User{}
-	for _, element := range users {
-		if element.Username == username {
-			u = element
-			return u, nil
-		}
+	Conn, err := sql.Open("mysql", sqlSrc)
+	if err != nil {
+		log.Fatalln(err)
 	}
-	err = errors.New("No user found")
+	defer Conn.Close()
+	res, err := Conn.Query("SELECT username, name, profile_url, password FROM users WHERE username = '" + username + "'")
+	if err != nil {
+		return u, err
+	}
+	defer res.Close()
+	res.Next()
+	res.Scan(&u.Username, &u.Name, &u.ProfileUrl, &u.Password)
 
 	return u, err
 }
