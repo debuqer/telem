@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -46,13 +45,9 @@ func addUser(u User) error {
 
 	users = append(users, u)
 
-	Conn, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/telem")
-	if err != nil {
-		log.Fatalln(err)
-	}
 	query := "INSERT INTO users ( name, username, password, profile_url, created_at ) VALUES ( '" + u.Name + "', '" + u.Username + "', '" + string(u.Password) + "', '" + u.ProfileUrl + "', NOW() )"
 	fmt.Println(query)
-	_, err = Conn.Exec(query)
+	_, err := Conn.Exec(query)
 	if err != nil {
 		log.Fatalln(err)
 	}

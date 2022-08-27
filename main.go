@@ -1,13 +1,17 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 var tpl *template.Template
+var Conn sql.DB
 
 func init() {
 	tpl = template.Must(template.New("").ParseGlob("templates/*.gohtml"))
@@ -15,6 +19,11 @@ func init() {
 
 func main() {
 	mux := httprouter.New()
+	Conn, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/telem")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(Conn)
 
 	mux.NotFound = http.HandlerFunc(notFound)
 	mux.GET("/signup", signup)
