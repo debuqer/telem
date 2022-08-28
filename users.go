@@ -49,7 +49,7 @@ func addUser(u User) error {
 	}
 	defer Conn.Close()
 	fmt.Println(Conn)
-	query := "INSERT INTO users ( name, username, password, profile_url, created_at ) VALUES ( '" + u.Name + "', '" + u.Username + "', '" + string(u.Password) + "', '" + u.ProfileUrl + "', NOW() )"
+	query := "INSERT INTO users ( name, username, password, profile_url, role, created_at ) VALUES ( '" + u.Name + "', '" + u.Username + "', '" + string(u.Password) + "', '" + u.ProfileUrl + "', '" + u.Role + "', NOW() )"
 	fmt.Println(query)
 	_, err = Conn.Exec(query)
 	if err != nil {
