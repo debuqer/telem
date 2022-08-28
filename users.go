@@ -95,13 +95,21 @@ func findUser(username string) (u User, err error) {
 }
 
 func isUsernameUnique(username string) bool {
-	for _, element := range users {
-		if username == element.Username {
-			return false
-		}
+	Conn, err := sql.Open("mysql", sqlSrc)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer Conn.Close()
+	res, err := Conn.Query("SELECT COUNT(*) as count FROM users WHERE username = '" + username + "'")
+	if err != nil {
+		return false
 	}
 
-	return true
+	var count int
+	res.Next()
+	res.Scan(&count)
+
+	return count == 0
 }
 
 func uploadProfile(r *http.Request) (string, error) {
