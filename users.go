@@ -72,10 +72,6 @@ func userLogin(username string, password string) (User, error) {
 	return User{}, errors.New("User not found")
 }
 
-func getUser(i int) User {
-	return users[i]
-}
-
 func findUser(username string) (u User, err error) {
 	u = User{}
 	Conn, err := sql.Open("mysql", sqlSrc)
