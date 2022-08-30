@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,19 +27,24 @@ type User struct {
 var users []User
 
 func addUser(u User) error {
-	if u.Name == "" || len(u.Name) < 3 {
+	validator := validator.New()
+	err := validator.Var(u.Name, "required,min=3")
+	if err != nil {
 		return errors.New("Name must contains at least 3 characters")
 	}
-	if u.Username == "" || len(u.Username) < 3 {
+
+	err = validator.Var(u.Username, "required,min=3")
+	if err != nil {
 		return errors.New("Username must contains at least 3 characters")
+	}
+
+	err = validator.Var(u.Username, "required,min=6")
+	if len(u.Password) < 6 {
+		return errors.New("Password must contains at least 6 characters")
 	}
 
 	if !isUsernameUnique(u.Username) {
 		return errors.New("Username must be unique")
-	}
-
-	if len(u.Password) < 6 {
-		return errors.New("Password must contains at least 6 characters")
 	}
 
 	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
