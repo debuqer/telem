@@ -10,7 +10,8 @@ import (
 var tpl *template.Template
 
 func init() {
-	tpl = template.Must(template.New("").ParseGlob("templates/*.gohtml"))
+	tpl = template.Must(template.New("").ParseGlob("templates/layouts/*.gohtml"))
+	tpl.ParseGlob("templates/*.gohtml")
 }
 
 func main() {
@@ -26,5 +27,6 @@ func main() {
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	mux.ServeFiles("/uploads/*filepath", http.Dir("uploads"))
-	http.ListenAndServe(":8080", mux)
+	err := http.ListenAndServe(":8088", mux)
+	panic(err)
 }
