@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -53,15 +52,12 @@ func addUser(u User) error {
 		log.Fatalln(err)
 	}
 	defer Conn.Close()
-	fmt.Println(Conn)
-	query := "INSERT INTO users ( name, username, password, profile_url, role, created_at ) VALUES ( '" + u.Name + "', '" + u.Username + "', '" + string(u.Password) + "', '" + u.ProfileUrl + "', '" + u.Role + "', NOW() )"
-	fmt.Println(query)
-	_, err = Conn.Exec(query)
+
+	stmt, err := Conn.Prepare("INSERT INTO users (name, username, password, profile_url, role, created_at ) VALUES (?, ?, ?, ?, ?, NOW())")
+	_, err = stmt.Exec(u.Name, u.Username, u.Password, u.ProfileUrl, u.Role)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	fmt.Println("user", u.Name, "with username", u.Username, "created")
 
 	return nil
 }
