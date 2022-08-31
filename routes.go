@@ -83,13 +83,24 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	tpl.ExecuteTemplate(w, "feed.gohtml", struct {
+	posts, _ := models.GetFeed()
+	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
 		Title string
-		Data  models.User
+		Data  struct {
+			User  models.User
+			Posts models.Posts
+		}
 	}{
 		"Feed",
-		u,
+		struct {
+			User  models.User
+			Posts models.Posts
+		}{
+			u,
+			posts,
+		},
 	})
+	panic(err)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,35 @@
+package models
+
+import "telem/helpers"
+
+type Post struct {
+	Id      int
+	User    User
+	Content string
+}
+
+type Posts []Post
+
+func GetFeed() ([]Post, error) {
+	posts := Posts{}
+
+	conn, err := helpers.GetConn()
+	if err != nil {
+		return make(Posts, 0), err
+	}
+
+	stmt, err := conn.Prepare("SELECT posts.id, posts.content, users.name, users.username, users.profile_url FROM posts JOIN users ON users.ID = posts.user_id ORDER BY ID DESC LIMIT 10")
+	row, _ := stmt.Query()
+
+	for row.Next() {
+		u := User{}
+		p := Post{}
+
+		row.Scan(&p.Id, &p.Content, &u.Name, &u.Username, &u.ProfileUrl)
+		p.User = u
+
+		posts = append(posts, p)
+	}
+
+	return posts, nil
+}
