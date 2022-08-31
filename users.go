@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -49,7 +48,7 @@ func addUser(u User) error {
 
 	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
 
-	Conn, err := sql.Open("mysql", sqlSrc)
+	Conn, err := getConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -80,7 +79,7 @@ func userLogin(username string, password string) (User, error) {
 
 func findUser(username string) (u User, err error) {
 	u = User{}
-	Conn, err := sql.Open("mysql", sqlSrc)
+	Conn, err := getConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -97,7 +96,7 @@ func findUser(username string) (u User, err error) {
 }
 
 func isUsernameUnique(username string) bool {
-	Conn, err := sql.Open("mysql", sqlSrc)
+	Conn, err := getConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
