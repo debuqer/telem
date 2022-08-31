@@ -1,8 +1,8 @@
-package main
+package helpers
 
 var dbSessions map[string]string = make(map[string]string)
 
-func getSession(sid string) string {
+func GetSession(sid string) string {
 	sessionValue, ok := dbSessions[sid]
 	if ok {
 		return sessionValue
@@ -11,10 +11,10 @@ func getSession(sid string) string {
 	return ""
 }
 
-func setSession(sid string, value string) {
+func SetSession(sid string, value string) {
 	dbSessions[sid] = value
 }
 
-func unsetSession(sid string) {
+func UnsetSession(sid string) {
 	delete(dbSessions, sid)
 }

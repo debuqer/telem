@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"telem/helpers"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
@@ -22,9 +23,7 @@ type User struct {
 	Role       string
 }
 
-var users []User
-
-func addUser(u User) error {
+func AddUser(u User) error {
 	validator := validator.New()
 	err := validator.Var(u.Name, "required,min=3")
 	if err != nil {
@@ -41,13 +40,13 @@ func addUser(u User) error {
 		return errors.New("Password must contains at least 6 characters")
 	}
 
-	if !isUsernameUnique(u.Username) {
+	if !IsUsernameUnique(u.Username) {
 		return errors.New("Username must be unique")
 	}
 
 	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
 
-	Conn, err := getConn()
+	Conn, err := helpers.GetConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -62,8 +61,8 @@ func addUser(u User) error {
 	return nil
 }
 
-func userLogin(username string, password string) (User, error) {
-	element, _ := findUser(username)
+func UserLogin(username string, password string) (User, error) {
+	element, _ := FindUser(username)
 	err := bcrypt.CompareHashAndPassword(element.Password, []byte(password))
 
 	if err == nil && element.Username == username {
@@ -73,9 +72,9 @@ func userLogin(username string, password string) (User, error) {
 	return User{}, errors.New("User not found")
 }
 
-func findUser(username string) (u User, err error) {
+func FindUser(username string) (u User, err error) {
 	u = User{}
-	Conn, err := getConn()
+	Conn, err := helpers.GetConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -92,8 +91,8 @@ func findUser(username string) (u User, err error) {
 	return u, err
 }
 
-func isUsernameUnique(username string) bool {
-	Conn, err := getConn()
+func IsUsernameUnique(username string) bool {
+	Conn, err := helpers.GetConn()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -111,7 +110,7 @@ func isUsernameUnique(username string) bool {
 	return count == 0
 }
 
-func uploadProfile(r *http.Request) (string, error) {
+func UploadProfile(r *http.Request) (string, error) {
 
 	f, h, err := r.FormFile("profile")
 	if err != nil {
@@ -135,11 +134,11 @@ func uploadProfile(r *http.Request) (string, error) {
 	return profileUrl, nil
 }
 
-func currentUser(r *http.Request) (User, error) {
-	sid := getCookieValue(r.Cookie("session"))
+func CurrentUser(r *http.Request) (User, error) {
+	sid := helpers.GetCookieValue(r.Cookie("session"))
 	if sid != "" {
-		un := getSession(sid)
-		u, err := findUser(un)
+		un := helpers.GetSession(sid)
+		u, err := FindUser(un)
 		if err != nil {
 			return User{}, errors.New("Not found user")
 		}

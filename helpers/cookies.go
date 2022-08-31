@@ -1,8 +1,8 @@
-package main
+package helpers
 
 import "net/http"
 
-func getCookieValue(c *http.Cookie, err error) string {
+func GetCookieValue(c *http.Cookie, err error) string {
 	if err == http.ErrNoCookie {
 		return ""
 	}
