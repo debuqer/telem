@@ -80,7 +80,8 @@ func findUser(username string) (u User, err error) {
 		log.Fatalln(err)
 	}
 	defer Conn.Close()
-	res, err := Conn.Query("SELECT username, name, profile_url, password FROM users WHERE username = '" + username + "'")
+	stmt, err := Conn.Prepare("SELECT username, name, profile_url, password FROM users WHERE username = ?")
+	res, err := stmt.Query(username)
 	if err != nil {
 		return u, err
 	}
@@ -97,10 +98,11 @@ func isUsernameUnique(username string) bool {
 		log.Fatalln(err)
 	}
 	defer Conn.Close()
-	res, err := Conn.Query("SELECT COUNT(*) as count FROM users WHERE username = '" + username + "'")
+	stmt, err := Conn.Prepare("SELECT COUNT(*) as count FROM users WHERE username = ?")
 	if err != nil {
 		return false
 	}
+	res, err := stmt.Query(username)
 
 	var count int
 	res.Next()
