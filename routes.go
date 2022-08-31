@@ -41,7 +41,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	_, err := models.CurrentUser(r)
 	if err == nil {
-		http.Redirect(w, r, "/panel", http.StatusSeeOther)
+		http.Redirect(w, r, "/feed", http.StatusSeeOther)
 	}
 
 	tpl.ExecuteTemplate(w, "login.gohtml", nil)
@@ -61,7 +61,7 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	helpers.SetCookie(w, "session", sid)
 	helpers.SetSession(sid, u.Username)
 
-	http.Redirect(w, r, "/panel", http.StatusSeeOther)
+	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
 
 func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -77,13 +77,13 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	return
 }
 
-func panel(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, err := models.CurrentUser(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	tpl.ExecuteTemplate(w, "panel.gohtml", u)
+	tpl.ExecuteTemplate(w, "feed.gohtml", u)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

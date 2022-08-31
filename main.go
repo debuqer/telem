@@ -22,7 +22,7 @@ func main() {
 	mux.GET("/login", login)
 	mux.POST("/login", applyLogin)
 	mux.GET("/logout", logout)
-	mux.GET("/panel", panel)
+	mux.GET("/feed", feed)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	mux.ServeFiles("/uploads/*filepath", http.Dir("uploads"))
