@@ -8,11 +8,9 @@ import (
 )
 
 var tpl *template.Template
-var sqlSrc string
 
 func init() {
 	tpl = template.Must(template.New("").ParseGlob("templates/*.gohtml"))
-	sqlSrc = "root:@tcp(127.0.0.1:3306)/telem"
 }
 
 func main() {
