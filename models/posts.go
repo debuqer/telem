@@ -1,6 +1,9 @@
 package models
 
-import "telem/helpers"
+import (
+	"fmt"
+	"telem/helpers"
+)
 
 type Post struct {
 	Id      int
@@ -32,4 +35,16 @@ func GetFeed() ([]Post, error) {
 	}
 
 	return posts, nil
+}
+
+func AddPost(content string) {
+	conn, err := helpers.GetConn()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer conn.Close()
+	c := content
+
+	stmt, err := conn.Prepare("INSERT INTO posts ( content, user_id, created_at ) VALUES ( ?, 3, NOW() )")
+	stmt.Exec(c)
 }

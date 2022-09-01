@@ -103,6 +103,13 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	panic(err)
 }
 
+func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	content := r.FormValue("content")
+	models.AddPost(content)
+
+	http.Redirect(w, r, "/feed", http.StatusSeeOther)
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
