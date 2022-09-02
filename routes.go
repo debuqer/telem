@@ -33,8 +33,18 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	_, err := models.CurrentUser(r)
+	u, err := models.CurrentUser(r)
 	if err == nil {
+		c, err := r.Cookie("session")
+		cv := helpers.GetCookieValue(c, err)
+		if cv == "" {
+			uuid, _ := uuid.NewUUID()
+			helpers.SetCookie(w, "session", uuid.String())
+			helpers.SetSession(uuid.String(), u.Username)
+		} else {
+			helpers.SetSession(cv, u.Username)
+		}
+
 		http.Redirect(w, r, "/feed", http.StatusSeeOther)
 	}
 
