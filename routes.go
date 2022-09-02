@@ -98,8 +98,10 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u, _ := models.CurrentUser(r)
 	content := r.FormValue("content")
-	models.AddPost(content)
+
+	models.AddPost(u, content)
 
 	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }

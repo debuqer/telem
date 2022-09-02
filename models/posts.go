@@ -37,7 +37,7 @@ func GetFeed() ([]Post, error) {
 	return posts, nil
 }
 
-func AddPost(content string) {
+func AddPost(u User, content string) {
 	conn, err := helpers.GetConn()
 	if err != nil {
 		fmt.Println(err)
@@ -45,6 +45,6 @@ func AddPost(content string) {
 	defer conn.Close()
 	c := content
 
-	stmt, err := conn.Prepare("INSERT INTO posts ( content, user_id, created_at ) VALUES ( ?, 3, NOW() )")
-	stmt.Exec(c)
+	stmt, err := conn.Prepare("INSERT INTO posts ( content, user_id, created_at ) VALUES ( ?, ?, NOW() )")
+	stmt.Exec(c, u.Id)
 }
