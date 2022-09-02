@@ -2,13 +2,56 @@
 
 <body>
     <div class="row">
-        <div class="col col-md-4">
-            <div class="col col-md-8 text-center">
-                <div class="row">
-                    <img src="{{ .Data.User.ProfileUrl }}" width="200px" />
-                </div>
-                <div class="row">
-                    <b>{{ .Data.User.Name }}</b>
+        <div class="col-md-4">
+            <div class="row profile">
+                <div class="text-center profile-sidebar">
+                    <!-- SIDEBAR USERPIC -->
+                    <div class="profile-userpic">
+                        <img src="{{ .Data.User.ProfileUrl }} "
+                            class="img-responsive" alt="">
+                    </div>
+                    <!-- END SIDEBAR USERPIC -->
+                    <!-- SIDEBAR USER TITLE -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name">
+                            {{ .Data.User.Name }}
+                        </div>
+                        <div class="profile-usertitle-job">
+                            {{ .Data.User.Username }}
+                        </div>
+                    </div>
+                    <!-- END SIDEBAR USER TITLE -->
+                    <!-- SIDEBAR BUTTONS -->
+                    <div class="profile-userbuttons">
+                        <button type="button" class="btn btn-success btn-sm">Follow</button>
+                        <a href="/logout" ><button type="button" class="btn btn-danger btn-sm">Logout</button></a>
+                    </div>
+                    <!-- END SIDEBAR BUTTONS -->
+                    <!-- SIDEBAR MENU -->
+                    <div class="profile-usermenu">
+                        <ul class="nav">
+                            <li class="active">
+                                <a href="#">
+                                    <i class="glyphicon glyphicon-home"></i>
+                                    Overview </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="glyphicon glyphicon-user"></i>
+                                    Account Settings </a>
+                            </li>
+                            <li>
+                                <a href="#" target="_blank">
+                                    <i class="glyphicon glyphicon-ok"></i>
+                                    Tasks </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="glyphicon glyphicon-flag"></i>
+                                    Help </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -17,46 +60,46 @@
                 Tweet something
                 <form action="/post" method="POST">
                     <textarea class="form-control" name="content" placeholder="Here is my tweet"></textarea>
-                    <br/>
-                    <input type="submit" class="btn btn-primary" value="Tweet"/>
+                    <br />
+                    <input type="submit" class="btn btn-primary" value="Tweet" />
                 </form>
             </div>
             {{ range .Data.Posts }}
-                <div class="col-md-11">
-                    <div class="media g-mb-30 media-comment">
-                        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
-                            src="{{ .User.ProfileUrl }}" alt="Image Description">
-                        <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
-                            <div class="g-mb-15">
-                                <h5 class="h5 g-color-gray-dark-v1 mb-0">{{ .User.Name }}</h5>
-                                <span class="g-color-gray-dark-v4 g-font-size-12">5 days ago</span>
-                            </div>
-    
-                            <p>{{ .Content }}</p>
-    
-                            <ul class="list-inline d-sm-flex my-0">
-                                <li class="list-inline-item g-mr-20">
-                                    <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
-                                        <i class="fa fa-thumbs-up g-pos-rel g-top-1 g-mr-3"></i>
-                                        178
-                                    </a>
-                                </li>
-                                <li class="list-inline-item g-mr-20">
-                                    <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
-                                        <i class="fa fa-thumbs-down g-pos-rel g-top-1 g-mr-3"></i>
-                                        34
-                                    </a>
-                                </li>
-                                <li class="list-inline-item ml-auto">
-                                    <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
-                                        <i class="fa fa-reply g-pos-rel g-top-1 g-mr-3"></i>
-                                        Reply
-                                    </a>
-                                </li>
-                            </ul>
+            <div class="col-md-11">
+                <div class="media g-mb-30 media-comment">
+                    <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                        src="{{ .User.ProfileUrl }}" alt="Image Description">
+                    <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                        <div class="g-mb-15">
+                            <h5 class="h5 g-color-gray-dark-v1 mb-0">{{ .User.Name }}</h5>
+                            <span class="g-color-gray-dark-v4 g-font-size-12">5 days ago</span>
                         </div>
+
+                        <p>{{ .Content }}</p>
+
+                        <ul class="list-inline d-sm-flex my-0">
+                            <li class="list-inline-item g-mr-20">
+                                <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
+                                    <i class="fa fa-thumbs-up g-pos-rel g-top-1 g-mr-3"></i>
+                                    178
+                                </a>
+                            </li>
+                            <li class="list-inline-item g-mr-20">
+                                <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
+                                    <i class="fa fa-thumbs-down g-pos-rel g-top-1 g-mr-3"></i>
+                                    34
+                                </a>
+                            </li>
+                            <li class="list-inline-item ml-auto">
+                                <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
+                                    <i class="fa fa-reply g-pos-rel g-top-1 g-mr-3"></i>
+                                    Reply
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+            </div>
             {{ end }}
         </div>
     </div>

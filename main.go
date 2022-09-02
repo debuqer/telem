@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"os"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -15,6 +16,11 @@ func init() {
 }
 
 func main() {
+	port := "8000"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+
 	mux := httprouter.New()
 
 	mux.NotFound = http.HandlerFunc(notFound)
@@ -28,6 +34,6 @@ func main() {
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	mux.ServeFiles("/uploads/*filepath", http.Dir("uploads"))
-	err := http.ListenAndServe(":8088", mux)
+	err := http.ListenAndServe(":"+port, mux)
 	panic(err)
 }
