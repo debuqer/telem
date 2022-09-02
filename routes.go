@@ -21,13 +21,7 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		fmt.Println(err)
 	}
 
-	err = models.AddUser(models.User{
-		Name:       r.FormValue("name"),
-		Username:   r.FormValue("username"),
-		Password:   []byte(r.FormValue("password")),
-		ProfileUrl: profileUrl,
-		Role:       "admin",
-	})
+	err = models.AddUser(r.FormValue("name"), r.FormValue("username"), r.FormValue("password"), profileUrl)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

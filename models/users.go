@@ -16,6 +16,7 @@ import (
 )
 
 type User struct {
+	Id         int
 	Name       string
 	Username   string
 	ProfileUrl string
@@ -23,28 +24,28 @@ type User struct {
 	Role       string
 }
 
-func AddUser(u User) error {
+func AddUser(name string, username string, password string, profileUrl string) error {
 	validator := validator.New()
-	err := validator.Var(u.Name, "required,min=3")
+	err := validator.Var(name, "required,min=3")
 	if err != nil {
 		return errors.New("Name must contains at least 3 characters")
 	}
 
-	err = validator.Var(u.Username, "required,min=3")
+	err = validator.Var(username, "required,min=3")
 	if err != nil {
 		return errors.New("Username must contains at least 3 characters")
 	}
 
-	err = validator.Var(u.Username, "required,min=6")
-	if len(u.Password) < 6 {
+	err = validator.Var(username, "required,min=6")
+	if len(password) < 6 {
 		return errors.New("Password must contains at least 6 characters")
 	}
 
-	if !IsUsernameUnique(u.Username) {
+	if !IsUsernameUnique(username) {
 		return errors.New("Username must be unique")
 	}
 
-	u.Password, _ = bcrypt.GenerateFromPassword(u.Password, bcrypt.MinCost)
+	pwd, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 
 	Conn, err := helpers.GetConn()
 	if err != nil {
@@ -53,7 +54,7 @@ func AddUser(u User) error {
 	defer Conn.Close()
 
 	stmt, err := Conn.Prepare("INSERT INTO users (name, username, password, profile_url, role, created_at ) VALUES (?, ?, ?, ?, ?, NOW())")
-	_, err = stmt.Exec(u.Name, u.Username, u.Password, u.ProfileUrl, u.Role)
+	_, err = stmt.Exec(name, username, pwd, profileUrl, "admin")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -79,14 +80,14 @@ func FindUser(username string) (u User, err error) {
 		log.Fatalln(err)
 	}
 	defer Conn.Close()
-	stmt, err := Conn.Prepare("SELECT username, name, profile_url, password FROM users WHERE username = ?")
+	stmt, err := Conn.Prepare("SELECT id, username, name, profile_url, password FROM users WHERE username = ?")
 	res, err := stmt.Query(username)
 	if err != nil {
 		return u, err
 	}
 	defer res.Close()
 	res.Next()
-	res.Scan(&u.Username, &u.Name, &u.ProfileUrl, &u.Password)
+	res.Scan(&u.Id, &u.Username, &u.Name, &u.ProfileUrl, &u.Password)
 
 	return u, err
 }
