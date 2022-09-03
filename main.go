@@ -4,14 +4,23 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 var tpl *template.Template
 
+func FormatDate(t time.Time) string {
+	return t.Format("02 Jan 2006 15:04")
+}
+
 func init() {
-	tpl = template.Must(template.New("").ParseGlob("templates/layouts/*.gohtml"))
+	fm := template.FuncMap{
+		"FormatDate": FormatDate,
+	}
+
+	tpl = template.Must(template.New("").Funcs(fm).ParseGlob("templates/layouts/*.gohtml"))
 	tpl.ParseGlob("templates/*.gohtml")
 }
 
