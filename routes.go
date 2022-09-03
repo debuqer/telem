@@ -48,7 +48,11 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.Redirect(w, r, "/feed", http.StatusSeeOther)
 	}
 
-	tpl.ExecuteTemplate(w, "login.gohtml", nil)
+	tpl.ExecuteTemplate(w, "login.gohtml", struct {
+		Title string
+	}{
+		"Login / Signup",
+	})
 }
 
 func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
