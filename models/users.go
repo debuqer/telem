@@ -81,6 +81,7 @@ func FindUser(username string) (u User, err error) {
 	}
 	defer Conn.Close()
 	stmt, err := Conn.Prepare("SELECT id, username, name, profile_url, password FROM users WHERE username = ?")
+
 	res, err := stmt.Query(username)
 	if err != nil {
 		return u, err
@@ -139,6 +140,10 @@ func CurrentUser(r *http.Request) (User, error) {
 	sid := helpers.GetCookieValue(r.Cookie("session"))
 	if sid != "" {
 		un := helpers.GetSession(sid)
+		if un == "" {
+			return User{}, errors.New("Not seted session")
+		}
+
 		u, err := FindUser(un)
 		if err != nil {
 			return User{}, errors.New("Not found user")
@@ -148,6 +153,14 @@ func CurrentUser(r *http.Request) (User, error) {
 	}
 
 	return User{}, errors.New("Not seted sid")
+}
+
+func UserLoggined(r *http.Request) bool {
+	if _, err := CurrentUser(r); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func havePerm(u User, roleName string) bool {

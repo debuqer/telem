@@ -89,6 +89,7 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, err := models.CurrentUser(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	posts, _ := models.GetFeed()
