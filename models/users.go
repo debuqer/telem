@@ -139,7 +139,7 @@ func UploadProfile(r *http.Request) (string, error) {
 func CurrentUser(r *http.Request) (User, error) {
 	sid := helpers.GetCookieValue(r.Cookie("session"))
 	if sid != "" {
-		un, hasItem := helpers.GetSession(sid)
+		un, hasItem := helpers.GetSession(sid, "username")
 		if !hasItem {
 			return User{}, errors.New("Not seted session")
 		}

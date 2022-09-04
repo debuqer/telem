@@ -2,7 +2,7 @@ package helpers
 
 var dbSessions map[string]string = make(map[string]string)
 
-func GetSession(sid string) (string, bool) {
+func GetSession(sid string, key string) (string, bool) {
 	var val string
 	var hasItem bool = false
 
@@ -11,11 +11,11 @@ func GetSession(sid string) (string, bool) {
 	if err != nil {
 		panic(err)
 	}
-	stmt, err := conn.Prepare("SELECT value FROM sessions WHERE sid = ?")
+	stmt, err := conn.Prepare("SELECT value FROM sessions WHERE sid = ? AND name = ?")
 	if err != nil {
 		panic(err)
 	}
-	row, err := stmt.Query(sid)
+	row, err := stmt.Query(sid, key)
 
 	for row.Next() {
 		row.Scan(&val)
@@ -25,38 +25,38 @@ func GetSession(sid string) (string, bool) {
 	return val, hasItem
 }
 
-func SetSession(sid string, value string) {
+func SetSession(sid string, key string, value string) {
 	conn, err := GetConn()
 	defer conn.Close()
 	if err != nil {
 		panic(err)
 	}
 
-	_, hasItem := GetSession(sid)
+	_, hasItem := GetSession(sid, key)
 	if hasItem {
-		stmt, err := conn.Prepare("UPDATE sessions SET value = ? WHERE sid = ?")
+		stmt, err := conn.Prepare("UPDATE sessions SET value = ? WHERE sid = ? AND name = ?")
 		if err != nil {
 			panic(err)
 		}
 
-		stmt.Exec(value, sid)
+		stmt.Exec(value, sid, key)
 	} else {
-		stmt, err := conn.Prepare("INSERT INTO sessions ( sid, value, created_at, expires_at) VALUES( ?, ?, NOW(), NOW())")
+		stmt, err := conn.Prepare("INSERT INTO sessions ( sid, name, value, created_at, expires_at) VALUES( ?, ?, ?, NOW(), NOW())")
 		if err != nil {
 			panic(err)
 		}
-		stmt.Exec(sid, value)
+		stmt.Exec(sid, key, value)
 	}
 }
 
-func UnsetSession(sid string) {
+func UnsetSession(sid string, key string) {
 	conn, err := GetConn()
 	defer conn.Close()
 
-	stmt, err := conn.Prepare("DELETE FROM sessions WHERE sid = ?")
+	stmt, err := conn.Prepare("DELETE FROM sessions WHERE sid = ? AND name = ?")
 	if err != nil {
 		panic(err)
 	}
 
-	stmt.Exec(sid)
+	stmt.Exec(sid, key)
 }

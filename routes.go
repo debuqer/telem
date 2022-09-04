@@ -40,9 +40,9 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		if cv == "" {
 			uuid, _ := uuid.NewUUID()
 			helpers.SetCookie(w, "session", uuid.String())
-			helpers.SetSession(uuid.String(), u.Username)
+			helpers.SetSession(uuid.String(), "username", u.Username)
 		} else {
-			helpers.SetSession(cv, u.Username)
+			helpers.SetSession(cv, "username", u.Username)
 		}
 
 		http.Redirect(w, r, "/feed", http.StatusSeeOther)
@@ -67,7 +67,7 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	sid := uuid.Must(uuid.NewRandom()).String()
 	helpers.SetCookie(w, "session", sid)
-	helpers.SetSession(sid, u.Username)
+	helpers.SetSession(sid, "username", u.Username)
 
 	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
@@ -78,7 +78,7 @@ func logout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if err == nil {
 		c.MaxAge = -1
 		http.SetCookie(w, c)
-		helpers.UnsetSession(c.Value)
+		helpers.UnsetSession(c.Value, "sid")
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
