@@ -110,7 +110,9 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			posts,
 		},
 	})
-	panic(err)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func score(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

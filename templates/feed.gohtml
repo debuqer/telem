@@ -7,8 +7,7 @@
                 <div class="text-center profile-sidebar">
                     <!-- SIDEBAR USERPIC -->
                     <div class="profile-userpic">
-                        <img src="{{ .Data.User.ProfileUrl }} "
-                            class="img-responsive" alt="">
+                        <img src="{{ .Data.User.ProfileUrl }} " class="img-responsive" alt="">
                     </div>
                     <!-- END SIDEBAR USERPIC -->
                     <!-- SIDEBAR USER TITLE -->
@@ -24,7 +23,7 @@
                     <!-- SIDEBAR BUTTONS -->
                     <div class="profile-userbuttons">
                         <button type="button" class="btn btn-success btn-sm">Follow</button>
-                        <a href="/logout" ><button type="button" class="btn btn-danger btn-sm">Logout</button></a>
+                        <a href="/logout"><button type="button" class="btn btn-danger btn-sm">Logout</button></a>
                     </div>
                     <!-- END SIDEBAR BUTTONS -->
                     <!-- SIDEBAR MENU -->
@@ -80,23 +79,24 @@
                         <ul class="list-inline d-sm-flex my-0">
                             <li class="list-inline-item g-mr-20">
                                 <form action="/score" method="POST">
-                                    <input type="hidden" name="pid" value="{{ .Id }}"/>
-                                    <input type="hidden" name="value" value="1"/>
+                                    <input type="hidden" name="pid" value="{{ .Id }}" />
+                                    <input type="hidden" name="value" value="1" />
                                     <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
                                         <button type="submit" class="fa fa-thumbs-up g-pos-rel g-top-1 g-mr-3"></button>
                                         {{ .Likes }}
                                     </a>
-                                </form>    
+                                </form>
                             </li>
                             <li class="list-inline-item g-mr-20">
                                 <form action="/score" method="POST">
-                                    <input type="hidden" name="pid" value="{{ .Id }}"/>
-                                    <input type="hidden" name="value" value="-1"/>
+                                    <input type="hidden" name="pid" value="{{ .Id }}" />
+                                    <input type="hidden" name="value" value="-1" />
                                     <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
-                                        <button type="submit" class="fa fa-thumbs-down g-pos-rel g-top-1 g-mr-3"></button>
+                                        <button type="submit"
+                                            class="fa fa-thumbs-down g-pos-rel g-top-1 g-mr-3"></button>
                                         {{ .Dislikes }}
                                     </a>
-                                </form> 
+                                </form>
                             </li>
                             <li class="list-inline-item ml-auto">
                                 <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
