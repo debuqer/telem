@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"telem/helpers"
 	"telem/models"
 
@@ -110,6 +111,20 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		},
 	})
 	panic(err)
+}
+
+func score(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	user, _ := models.CurrentUser(r)
+	pid := r.FormValue("pid")
+
+	pidNumber, _ := strconv.Atoi(pid)
+	post := models.FindPost(pidNumber)
+	value := r.FormValue("value")
+	valueNumber, _ := strconv.Atoi(value)
+
+	post.Score(user, valueNumber)
+
+	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
 
 func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

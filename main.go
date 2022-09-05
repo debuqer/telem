@@ -40,6 +40,7 @@ func main() {
 	mux.GET("/logout", logout)
 	mux.GET("/feed", feed)
 	mux.POST("/post", post)
+	mux.POST("/score", score)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	mux.ServeFiles("/uploads/*filepath", http.Dir("uploads"))
