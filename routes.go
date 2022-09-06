@@ -138,6 +138,14 @@ func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
 
+func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
+	pid := h.ByName("pid")
+	pidNumber, _ := strconv.Atoi(pid)
+	post := models.FindPost(pidNumber)
+
+	tpl.ExecuteTemplate(w, "single-post.gohtml", post)
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
