@@ -126,7 +126,7 @@ func score(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	post.Score(user, valueNumber)
 
-	http.Redirect(w, r, "/feed", http.StatusSeeOther)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
 
 func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -135,7 +135,7 @@ func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	models.AddPost(u, content)
 
-	http.Redirect(w, r, "/feed", http.StatusSeeOther)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
 
 func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
@@ -143,7 +143,16 @@ func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
 	pidNumber, _ := strconv.Atoi(pid)
 	post := models.FindPost(pidNumber)
 
-	tpl.ExecuteTemplate(w, "single-post.gohtml", post)
+	err := tpl.ExecuteTemplate(w, "single-post.gohtml", struct {
+		Title string
+		Post  models.Post
+	}{
+		"Post",
+		post,
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

@@ -59,7 +59,7 @@ func FindPost(pid int) Post {
 	for row.Next() {
 		var cr string
 
-		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, p.Likes, p.Dislikes)
+		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, &p.Likes, &p.Dislikes)
 		p.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", cr)
 
 		p.User = u
