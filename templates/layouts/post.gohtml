@@ -21,16 +21,6 @@
                     </a>
                 </form>
             </li>
-            <li class="list-inline-item g-mr-20">
-                <form action="/score" method="POST">
-                    <input type="hidden" name="pid" value="{{ .Id }}" />
-                    <input type="hidden" name="value" value="-1" />
-                    <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#!">
-                        <button type="submit" class="fa fa-thumbs-down g-pos-rel g-top-1 g-mr-3"></button>
-                        {{ .Dislikes }}
-                    </a>
-                </form>
-            </li>
             <li class="list-inline-item ml-auto">
                 <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="/post/{{ .Id }}">
                     <i class="fa fa-reply g-pos-rel g-top-1 g-mr-3"></i>
