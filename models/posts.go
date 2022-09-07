@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"telem/helpers"
 	"time"
@@ -13,11 +14,12 @@ type Post struct {
 	CreatedAt time.Time
 	Likes     int
 	Dislikes  int
+	Posts     []Post
 }
 
 type Posts []Post
 
-func GetFeed() ([]Post, error) {
+func GetPosts(pid int) ([]Post, error) {
 	posts := Posts{}
 
 	conn, err := helpers.GetConn()
@@ -25,8 +27,16 @@ func GetFeed() ([]Post, error) {
 		return make(Posts, 0), err
 	}
 
-	stmt, err := conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id ORDER BY ID DESC LIMIT 10")
-	row, err := stmt.Query()
+	var row *sql.Rows
+	var stmt *sql.Stmt
+
+	if pid == 0 {
+		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id ORDER BY ID DESC LIMIT 10")
+		row, err = stmt.Query()
+	} else {
+		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id = ? ORDER BY ID DESC LIMIT 10")
+		row, err = stmt.Query(pid)
+	}
 
 	for row.Next() {
 		u := User{}
@@ -63,12 +73,13 @@ func FindPost(pid int) Post {
 		p.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", cr)
 
 		p.User = u
+		p.Posts, _ = GetPosts(p.Id)
 	}
 
 	return p
 }
 
-func AddPost(u User, content string) {
+func AddPost(u User, content string, pid int) {
 	conn, err := helpers.GetConn()
 	if err != nil {
 		fmt.Println(err)
@@ -76,8 +87,13 @@ func AddPost(u User, content string) {
 	defer conn.Close()
 	c := content
 
-	stmt, err := conn.Prepare("INSERT INTO posts ( content, user_id, created_at ) VALUES ( ?, ?, NOW() )")
-	stmt.Exec(c, u.Id)
+	if pid == 0 {
+		stmt, _ := conn.Prepare("INSERT INTO posts ( content, user_id, created_at ) VALUES ( ?, ?, NOW() )")
+		stmt.Exec(c, u.Id)
+	} else {
+		stmt, _ := conn.Prepare("INSERT INTO posts ( content, user_id, created_at, post_id ) VALUES ( ?, ?, NOW(), ? )")
+		stmt.Exec(c, u.Id, pid)
+	}
 }
 
 func (p *Post) Score(u User, value int) {

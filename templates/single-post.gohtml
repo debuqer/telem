@@ -1,8 +1,32 @@
 {{ template "header" . }}
 
 <body>
-    <div class="row">
-        {{ template "post" .Post }}
+    <div class="pl-2 col-md-8">
+
+        <div class="row">
+            {{ template "post" .Post }}
+        </div>
+        <br/>
+        <div class="row">
+            <form method="POST" action="/post">
+                <input type="hidden" name="pid" value="{{ .Post.Id }}" />
+                <div class="row">
+                    <div class="col-md-10">
+                        <textarea name="content" class="form-control" placeholder="Reply ..."></textarea>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Reply</button>
+                    </div>    
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            {{ range .Post.Posts }}
+                <div class="col-md-11">
+                    {{ template "post" .}}
+                </div>
+            {{ end }}
+        </div>
     </div>
 </body>
 

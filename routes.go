@@ -93,7 +93,7 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	posts, _ := models.GetFeed()
+	posts, _ := models.GetPosts(0)
 	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
 		Title string
 		Data  struct {
@@ -132,8 +132,9 @@ func score(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, _ := models.CurrentUser(r)
 	content := r.FormValue("content")
+	pid, _ := strconv.Atoi(r.FormValue("pid"))
 
-	models.AddPost(u, content)
+	models.AddPost(u, content, pid)
 
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
