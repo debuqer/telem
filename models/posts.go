@@ -14,6 +14,7 @@ type Post struct {
 	CreatedAt time.Time
 	Likes     int
 	Dislikes  int
+	Replies   int
 	Posts     []Post
 }
 
@@ -31,10 +32,10 @@ func GetPosts(pid int) ([]Post, error) {
 	var stmt *sql.Stmt
 
 	if pid == 0 {
-		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id ORDER BY ID DESC LIMIT 10")
+		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id IS NULL ORDER BY ID DESC LIMIT 10")
 		row, err = stmt.Query()
 	} else {
-		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id = ? ORDER BY ID DESC LIMIT 10")
+		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id = ? ORDER BY ID DESC LIMIT 10")
 		row, err = stmt.Query(pid)
 	}
 
@@ -43,7 +44,7 @@ func GetPosts(pid int) ([]Post, error) {
 		p := Post{}
 		var cr string
 
-		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, &p.Likes, &p.Dislikes)
+		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, &p.Likes, &p.Dislikes, &p.Replies)
 		p.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", cr)
 
 		p.User = u
@@ -61,7 +62,7 @@ func FindPost(pid int) Post {
 		panic(err)
 	}
 
-	stmt, err := conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes FROM posts JOIN users ON users.ID = posts.user_id WHERE posts.id = ? ORDER BY ID DESC")
+	stmt, err := conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts where post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE posts.id = ? ORDER BY ID DESC")
 	row, _ := stmt.Query(pid)
 
 	u := User{}
@@ -69,7 +70,7 @@ func FindPost(pid int) Post {
 	for row.Next() {
 		var cr string
 
-		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, &p.Likes, &p.Dislikes)
+		row.Scan(&p.Id, &p.Content, &cr, &u.Name, &u.Username, &u.ProfileUrl, &p.Likes, &p.Dislikes, &p.Replies)
 		p.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", cr)
 
 		p.User = u
