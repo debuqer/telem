@@ -1,16 +1,25 @@
 package helpers
 
-import "github.com/google/uuid"
+import (
+	"net/http"
 
-func GetCsrfToken(sid string) string {
+	"github.com/google/uuid"
+)
+
+func GetCsrfToken(w http.ResponseWriter, r *http.Request) string {
+	cookieToken := uuid.Must(uuid.NewRandom()).String()
+
+	SetCookie(w, "csrf_token", cookieToken)
+
 	token := uuid.Must(uuid.NewRandom()).String()
-	SetSession(sid, "csrf", token)
+	SetSession(cookieToken, "csrf", token)
 
 	return token
 }
 
-func MatchCsrf(sid string, token string) bool {
-	if csrfToken, hasItem := GetSession(sid, "csrf"); hasItem {
+func MatchCsrf(r *http.Request, token string) bool {
+	coockieToken := GetCookieValue(r.Cookie("csrf_token"))
+	if csrfToken, hasItem := GetSession(coockieToken, "csrf"); hasItem {
 		return token == csrfToken
 	}
 

@@ -51,8 +51,10 @@ func login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	tpl.ExecuteTemplate(w, "login.gohtml", struct {
 		Title string
+		Csrf  string
 	}{
 		"Login / Signup",
+		helpers.GetCsrfToken(w, r),
 	})
 }
 
@@ -63,6 +65,11 @@ func applyLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, err := models.UserLogin(username, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if !helpers.MatchCsrf(r, r.FormValue("csrf_token")) {
+		http.Error(w, "Csrf Not Found", http.StatusUnauthorized)
 		return
 	}
 
