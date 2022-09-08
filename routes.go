@@ -140,16 +140,26 @@ func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
+	u, _ := models.CurrentUser(r)
 	pid := h.ByName("pid")
 	pidNumber, _ := strconv.Atoi(pid)
 	post := models.FindPost(pidNumber)
 
 	err := tpl.ExecuteTemplate(w, "single-post.gohtml", struct {
 		Title string
-		Post  models.Post
+		Data  struct {
+			User models.User
+			Post models.Post
+		}
 	}{
 		"Post",
-		post,
+		struct {
+			User models.User
+			Post models.Post
+		}{
+			u,
+			post,
+		},
 	})
 	if err != nil {
 		fmt.Println(err)
