@@ -119,14 +119,14 @@ func UploadProfile(r *http.Request) (string, error) {
 		return "", errors.New("Profile image must be present")
 	}
 
-	profileUrl := filepath.Join("/uploads/", strings.Replace(h.Filename, " ", "-", -1))
+	profileUrl := filepath.Join("/uploads/user/", strings.Replace(h.Filename, " ", "-", -1))
 
 	bs, err := ioutil.ReadAll(f)
 	if err != nil {
 		return "", errors.New("Profile image cant be read")
 	}
 
-	newFile, err := os.Create("/uploads/" + h.Filename)
+	newFile, err := os.Create("/uploads/user/" + h.Filename)
 	if err != nil {
 		return "", errors.New("Profile image does not seted properly")
 	}
