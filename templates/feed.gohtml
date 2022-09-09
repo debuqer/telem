@@ -9,6 +9,7 @@
             <div class="col-md-11">
                 Tweet something
                 <form action="/post" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ .Csrf }}" />
                     <textarea class="form-control" name="content" placeholder="Here is my tweet"></textarea>
                     <br />
                     <input type="submit" class="btn btn-primary" value="Tweet" />

@@ -103,12 +103,14 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	posts, _ := models.GetPosts(0)
 	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
 		Title string
+		Csrf  string
 		Data  struct {
 			User  models.User
 			Posts models.Posts
 		}
 	}{
 		"Feed",
+		helpers.GetCsrfToken(w, r),
 		struct {
 			User  models.User
 			Posts models.Posts
@@ -140,6 +142,11 @@ func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, _ := models.CurrentUser(r)
 	content := r.FormValue("content")
 	pid, _ := strconv.Atoi(r.FormValue("pid"))
+
+	if !helpers.MatchCsrf(r, r.FormValue("csrf_token")) {
+		http.Error(w, "Csrf Not Found", http.StatusUnauthorized)
+		return
+	}
 
 	models.AddPost(u, content, pid)
 
