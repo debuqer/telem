@@ -13,6 +13,7 @@
             <br />
             <div class="row">
                 <form method="POST" action="/post">
+                    <input type="hidden" name="csrf_token" value="{{ .Csrf }}" />
                     <input type="hidden" name="pid" value="{{ .Data.Post.Id }}" />
                     <div class="row">
                         <div class="col-md-10">

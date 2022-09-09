@@ -161,12 +161,14 @@ func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
 
 	err := tpl.ExecuteTemplate(w, "single-post.gohtml", struct {
 		Title string
+		Csrf  string
 		Data  struct {
 			User models.User
 			Post models.Post
 		}
 	}{
 		"Post",
+		helpers.GetCsrfToken(w, r),
 		struct {
 			User models.User
 			Post models.Post
