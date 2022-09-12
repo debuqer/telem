@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"telem/helpers"
@@ -12,7 +13,24 @@ import (
 )
 
 func signup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
+	u, _ := models.CurrentUser(r)
+
+	err := tpl.ExecuteTemplate(w, "signup.gohtml", struct {
+		Title string
+		Csrf  string
+		Data  struct {
+			User models.User
+		}
+	}{
+		"Post",
+		helpers.GetCsrfToken(w, r),
+		struct{ User models.User }{
+			u,
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
