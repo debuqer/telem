@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -126,8 +127,9 @@ func UploadProfile(r *http.Request) (string, error) {
 		return "", errors.New("Profile image cant be read")
 	}
 
-	newFile, err := os.Create("/uploads/user/" + h.Filename)
+	newFile, err := os.Create("uploads/user/" + h.Filename)
 	if err != nil {
+		fmt.Println(err)
 		return "", errors.New("Profile image does not seted properly")
 	}
 	defer newFile.Close()

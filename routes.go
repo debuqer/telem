@@ -37,14 +37,14 @@ func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	profileUrl, err := models.UploadProfile(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Println(err)
+		return
 	}
 
 	err = models.AddUser(r.FormValue("name"), r.FormValue("username"), r.FormValue("password"), profileUrl)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Println(err)
+		return
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
