@@ -34,6 +34,11 @@ func signup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func applySignup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if !helpers.MatchCsrf(r, r.FormValue("csrf_token")) {
+		http.Error(w, "Csrf Not Found", http.StatusUnauthorized)
+		return
+	}
+
 	profileUrl, err := models.UploadProfile(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -123,7 +128,7 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
 		Title string
 		Csrf  string
