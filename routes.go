@@ -118,7 +118,12 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	posts, _ := models.GetPosts(0)
+	posts, err := models.GetPosts(0)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
 	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
 		Title string
 		Csrf  string
