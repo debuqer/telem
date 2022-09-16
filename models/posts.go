@@ -20,7 +20,7 @@ type Post struct {
 
 type Posts []Post
 
-func GetPosts(pid int) ([]Post, error) {
+func GetPosts(pid int, uid int) ([]Post, error) {
 	posts := Posts{}
 
 	conn, err := helpers.GetConn()
@@ -32,8 +32,13 @@ func GetPosts(pid int) ([]Post, error) {
 	var stmt *sql.Stmt
 
 	if pid == 0 {
-		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id IS NULL ORDER BY ID DESC LIMIT 10")
-		row, err = stmt.Query()
+		if uid != 0 {
+			stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id IS NULL AND user_id = ? ORDER BY ID DESC LIMIT 10")
+			row, err = stmt.Query(uid)
+		} else {
+			stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id IS NULL ORDER BY ID DESC LIMIT 10")
+			row, err = stmt.Query()
+		}
 	} else {
 		stmt, err = conn.Prepare("SELECT posts.id, posts.content, posts.created_at, users.name, users.username, users.profile_url, (Select count(1) from likes where post_id = posts.id AND value = 1) as likes, (Select count(1) from likes where post_id = posts.id AND value = -1) as dislikes, (select count(1) from posts as p where p.post_id = posts.id) as replies FROM posts JOIN users ON users.ID = posts.user_id WHERE post_id = ? ORDER BY ID DESC LIMIT 10")
 		row, err = stmt.Query(pid)
@@ -74,7 +79,7 @@ func FindPost(pid int) Post {
 		p.CreatedAt, _ = time.Parse("2006-01-02 15:04:05", cr)
 
 		p.User = u
-		p.Posts, _ = GetPosts(p.Id)
+		p.Posts, _ = GetPosts(p.Id, 0)
 	}
 
 	return p

@@ -42,6 +42,7 @@ func main() {
 	mux.POST("/post", post)
 	mux.POST("/score", score)
 	mux.GET("/post/:pid", singlePost)
+	mux.GET("/user/:uname", userProfile)
 
 	mux.ServeFiles("/statics/*filepath", http.Dir("statics"))
 	mux.ServeFiles("/uploads/*filepath", http.Dir("uploads"))
