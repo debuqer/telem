@@ -167,14 +167,14 @@ func score(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func post(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u, _ := models.CurrentUser(r)
-	content := r.FormValue("content")
-	pid, _ := strconv.Atoi(r.FormValue("pid"))
-
 	if !helpers.MatchCsrf(r, r.FormValue("csrf_token")) {
 		http.Error(w, "Csrf Not Found", http.StatusUnauthorized)
 		return
 	}
+
+	u, _ := models.CurrentUser(r)
+	content := r.FormValue("content")
+	pid, _ := strconv.Atoi(r.FormValue("pid"))
 
 	models.AddPost(u, content, pid)
 
