@@ -166,3 +166,94 @@ func UserLoggined(r *http.Request) bool {
 func havePerm(u User, roleName string) bool {
 	return u.Role == roleName
 }
+
+func (u *User) GetFollowers() []User {
+	Conn, err := helpers.GetConn()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer Conn.Close()
+	stmt, err := Conn.Prepare("SELECT id, username, name, profile_url FROM users JOIN follows ON follows.follower_id = users.id WHERE follows.following_id = ?")
+
+	row, _ := stmt.Query(u.Id)
+
+	var users []User
+	var newUser User
+
+	for row.Next() {
+		row.Scan(&newUser.Id, &newUser.Username, &newUser.Name, &newUser.ProfileUrl)
+		users = append(users, newUser)
+	}
+
+	return users
+}
+
+func (u *User) GetFollowings() []User {
+	Conn, err := helpers.GetConn()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer Conn.Close()
+	stmt, err := Conn.Prepare("SELECT id, username, name, profile_url FROM users JOIN follows ON follows.following_id = users.id WHERE follows.follower_id = ?")
+
+	row, _ := stmt.Query(u.Id)
+
+	var users []User
+	var newUser User
+
+	for row.Next() {
+		row.Scan(&newUser.Id, &newUser.Username, &newUser.Name, &newUser.ProfileUrl)
+		users = append(users, newUser)
+	}
+
+	return users
+}
+
+func (u *User) Follows(following User) bool {
+	conn, err := helpers.GetConn()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := conn.Prepare("SELECT count(*) FROM follows where follower_id = ? and following_id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	row, _ := stmt.Query(u.Id, following.Id)
+	row.Next()
+	var follows int
+	row.Scan(&follows)
+
+	return follows == 1
+}
+
+func (u *User) Follow(following User) {
+	if !u.Follows(following) {
+		conn, err := helpers.GetConn()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		stmt, err := conn.Prepare("INSERT INTO FOLLOWS(follower_id , following_id) VALUES (?, ?)")
+		if err != nil {
+			log.Fatal(err)
+		}
+		stmt.Exec(u.Id, following.Id)
+	}
+}
+
+func (u *User) Unfollow(following User) {
+	if u.Follows(following) {
+		conn, err := helpers.GetConn()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		stmt, err := conn.Prepare("DELETE FROM FOLLOWS WHERE follower_id = ? AND following_id = ?")
+		if err != nil {
+			log.Fatal(err)
+		}
+		stmt.Exec(u.Id, following.Id)
+	}
+}
