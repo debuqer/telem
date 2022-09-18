@@ -246,6 +246,21 @@ func singlePost(w http.ResponseWriter, r *http.Request, h httprouter.Params) {
 	}
 }
 
+func followToggle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u, _ := models.CurrentUser(r)
+
+	following, _ := models.FindUser(r.FormValue("following_uname"))
+
+	if !u.Follows(following) {
+		u.Follow(following)
+	} else {
+		u.Unfollow(following)
+	}
+
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
+	return
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }

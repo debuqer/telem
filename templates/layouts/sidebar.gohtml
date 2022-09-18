@@ -18,7 +18,11 @@
             <!-- END SIDEBAR USER TITLE -->
             <!-- SIDEBAR BUTTONS -->
             <div class="profile-userbuttons">
-                <button type="button" class="btn btn-success btn-sm">Follow</button>
+                <form method="POST" action="/follow" />
+                    <input type="hidden" name="csrf_token" value="{{ .Csrf }}" />
+                    <input type="hidden" name="following_uname" value="{{ .Data.User.Username }}" />
+                    <button type="submit" class="btn btn-success btn-sm">Follow</button>
+                </form>
                 <a href="/logout"><button type="button" class="btn btn-danger btn-sm">Logout</button></a>
             </div>
             <!-- END SIDEBAR BUTTONS -->

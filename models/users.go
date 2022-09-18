@@ -16,12 +16,14 @@ import (
 )
 
 type User struct {
-	Id         int
-	Name       string
-	Username   string
-	ProfileUrl string
-	Password   []byte
-	Role       string
+	Id          int
+	Name        string
+	Username    string
+	ProfileUrl  string
+	Password    []byte
+	Role        string
+	IsFollowing bool
+	IsFollower  bool
 }
 
 func AddUser(name string, username string, password string, profileUrl string) error {
@@ -235,7 +237,7 @@ func (u *User) Follow(following User) {
 			log.Fatal(err)
 		}
 
-		stmt, err := conn.Prepare("INSERT INTO FOLLOWS(follower_id , following_id) VALUES (?, ?)")
+		stmt, err := conn.Prepare("INSERT INTO follows(follower_id , following_id) VALUES (?, ?)")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -250,7 +252,7 @@ func (u *User) Unfollow(following User) {
 			log.Fatal(err)
 		}
 
-		stmt, err := conn.Prepare("DELETE FROM FOLLOWS WHERE follower_id = ? AND following_id = ?")
+		stmt, err := conn.Prepare("DELETE FROM follows WHERE follower_id = ? AND following_id = ?")
 		if err != nil {
 			log.Fatal(err)
 		}
