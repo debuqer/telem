@@ -261,6 +261,29 @@ func followToggle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	return
 }
 
+func setting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u, _ := models.CurrentUser(r)
+
+	err := tpl.ExecuteTemplate(w, "setting.gohtml", struct {
+		Title string
+		Csrf  string
+		Data  struct {
+			User models.User
+		}
+	}{
+		"Setting",
+		helpers.GetCsrfToken(w, r),
+		struct {
+			User models.User
+		}{
+			u,
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
