@@ -64,6 +64,22 @@ func AddUser(name string, username string, password string, profileUrl string) e
 	return nil
 }
 
+func UpdateUser(u User) error {
+	Conn, err := helpers.GetConn()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer Conn.Close()
+
+	stmt, err := Conn.Prepare("UPDATE users SET name = ? WHERE username = ?")
+	_, err = stmt.Exec(u.Name, u.Username)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return nil
+}
+
 func UserLogin(username string, password string) (User, error) {
 	element, _ := FindUser(username)
 	err := bcrypt.CompareHashAndPassword(element.Password, []byte(password))

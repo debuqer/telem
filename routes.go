@@ -284,6 +284,15 @@ func setting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 }
 
+func updateSetting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u, _ := models.CurrentUser(r)
+	u.Name = r.FormValue("name")
+
+	models.UpdateUser(u)
+
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
