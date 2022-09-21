@@ -71,8 +71,8 @@ func UpdateUser(u User) error {
 	}
 	defer Conn.Close()
 
-	stmt, err := Conn.Prepare("UPDATE users SET name = ? WHERE username = ?")
-	_, err = stmt.Exec(u.Name, u.Username)
+	stmt, err := Conn.Prepare("UPDATE users SET name = ?, profile_url = ? WHERE username = ?")
+	_, err = stmt.Exec(u.Name, u.ProfileUrl, u.Username)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -287,6 +287,11 @@ func setting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func updateSetting(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u, _ := models.CurrentUser(r)
 	u.Name = r.FormValue("name")
+	profileUrl, err := models.UploadProfile(r)
+	if err != nil {
+		profileUrl = u.ProfileUrl
+	}
+	u.ProfileUrl = profileUrl
 
 	models.UpdateUser(u)
 
