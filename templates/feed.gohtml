@@ -16,12 +16,30 @@
                 </form>
             </div>
             {{ range .Data.Posts }}
-                <div class="col-md-11">
-                    {{ template "post" .}}
-                </div>
+            <div class="col-md-11">
+                {{ template "post" .}}
+            </div>
             {{ end }}
+
+            <div id="other-posts-container">
+
+            </div>
+
+            <button id="show-more" class="btn btn-primary">Show more</button>
         </div>
     </div>
+    <script>
+        var page = 2;
+        $("#show-more").click(function () {
+            $.ajax({
+                url: '/other-posts?page='+page,
+                success: function (data) {
+                    $('#other-posts-container').append(data);
+                }
+            });
+            page += 1;
+        })
+    </script>
 </body>
 
 </html>

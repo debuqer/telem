@@ -39,6 +39,7 @@ func main() {
 	mux.POST("/login", applyLogin)
 	mux.GET("/logout", logout)
 	mux.GET("/feed", feed)
+	mux.GET("/other-posts", otherPosts)
 	mux.POST("/post", post)
 	mux.POST("/score", score)
 	mux.GET("/post/:pid", singlePost)

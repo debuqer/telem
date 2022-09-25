@@ -123,13 +123,50 @@ func feed(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	posts, err := models.GetPosts(0, 0)
+	posts, err := models.GetPosts(0, 0, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = tpl.ExecuteTemplate(w, "feed.gohtml", struct {
+		Title string
+		Csrf  string
+		Data  struct {
+			User  models.User
+			Posts models.Posts
+		}
+	}{
+		"Feed",
+		helpers.GetCsrfToken(w, r),
+		struct {
+			User  models.User
+			Posts models.Posts
+		}{
+			u,
+			posts,
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func otherPosts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	page, _ := strconv.Atoi(r.FormValue("page"))
+	u, err := models.CurrentUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	posts, err := models.GetPosts(0, 0, page)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tpl.ExecuteTemplate(w, "other-posts.gohtml", struct {
 		Title string
 		Csrf  string
 		Data  struct {
@@ -159,7 +196,7 @@ func userProfile(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
-	posts, err := models.GetPosts(0, u.Id)
+	posts, err := models.GetPosts(0, u.Id, 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
